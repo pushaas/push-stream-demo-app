@@ -3,26 +3,51 @@ import React, { Component } from 'react'
 import Header from './Header'
 import Connections from './Connections'
 
-import idService from '../../services/idService'
 import pushStreamService from '../../services/pushStreamService'
 
 import ConnectionInfo from '../../models/ConnectionInfo'
 
-import PushStream from '../../external/PushStream'
+import { modeEventSource } from '../../constants/modes'
 
 class App extends Component {
   state = {
     connectionsInfo: [],
+    suggestions: {
+      connectionInfo: {
+        channel: 'test',
+        host: 'localhost',
+        mode: modeEventSource,
+        port: '9080',
+      },
+    },
   }
 
+  /*
+    ---------------
+    lifecycle
+    ---------------
+  */
   componentDidMount() {
-    this.pushStream = pushStreamService.newConnection()
+    this.handleAddConnectionInfo()
+  }
+
+  /*
+    ---------------
+    handlers
+    ---------------
+  */
+  updateConnectionInfoSuggestions = (field, value) => {
+    this.setState({
+      suggestions: {
+        ...this.state.suggestions,
+        connectionInfo: { ...this.state.suggestions.connectionInfo, [field]: value }
+      }
+    })
   }
 
   handleAddConnectionInfo = () => {
     const connectionInfo = new ConnectionInfo({
-      id: idService.generateId(),
-      state: PushStream.CLOSED,
+      ...this.state.suggestions.connectionInfo,
     })
 
     this.setState({
@@ -31,8 +56,10 @@ class App extends Component {
   }
 
   handleUpdateConnectionInfo = (connectionInfo, field, value) => {
+    this.updateConnectionInfoSuggestions(field, value)
+
     this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.map(c => c === connectionInfo ? { ...connectionInfo, [field]: value } : connectionInfo )],
+      connectionsInfo: [...this.state.connectionsInfo.map(c => c === connectionInfo ? { ...connectionInfo, [field]: value } : c )],
     })
   }
 
@@ -43,7 +70,10 @@ class App extends Component {
   }
 
   handleConnect = (connectionInfo) => {
-    console.log('### handleConnect', connectionInfo)
+    // TODO fill settings
+    const settings = {}
+    connectionInfo.pushStream = pushStreamService.newConnection(settings)
+    connectionInfo.pushStream.connect()
   }
 
   handleDisconnect = (connectionInfo) => {

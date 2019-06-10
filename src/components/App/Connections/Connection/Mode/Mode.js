@@ -7,11 +7,11 @@ import {
   modeWebSocket,
 } from '../../../../../constants/modes'
 
-const ConnectionMode = ({ connectionInfo, onUpdateConnectionInfo }) => {
+const Mode = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
-    <div className="ConnectionMode">
+    <div className="Mode">
       <select
-        value={connectionInfo.method}
+        value={connectionInfo.mode}
         onChange={(e) => onUpdateConnectionInfo('mode', e.target.value)}
       >
         <option value={modeEventSource}>{modeEventSource}</option>
@@ -23,4 +23,4 @@ const ConnectionMode = ({ connectionInfo, onUpdateConnectionInfo }) => {
   )
 }
 
-export default ConnectionMode
+export default Mode

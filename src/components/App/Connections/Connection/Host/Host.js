@@ -1,8 +1,8 @@
 import React from 'react'
 
-const ConnectionHost = ({ connectionInfo, onUpdateConnectionInfo }) => {
+const Host = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
-    <div className="ConnectionHost">
+    <div className="Host">
       <input
         placeholder="PushStream host"
         onChange={(e) => onUpdateConnectionInfo('host', e.target.value)}
@@ -12,4 +12,4 @@ const ConnectionHost = ({ connectionInfo, onUpdateConnectionInfo }) => {
   )
 }
 
-export default ConnectionHost
+export default Host

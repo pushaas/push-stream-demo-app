@@ -1,16 +1,22 @@
-import { modeEventSource } from '../constants/modes'
+import idService from '../services/idService'
+
+import PushStream from '../external/PushStream'
 
 class ConnectionInfo {
   constructor({
-    id,
-    state,
+    channel = '',
     host = '',
-    mode = modeEventSource,
+    mode = '',
+    port = '',
+    state = PushStream.CLOSED,
   }) {
-    this.id = id
-    this.state = state
+    this.id = idService.generateId()
+
+    this.channel = channel
     this.host = host
     this.mode = mode
+    this.port = port
+    this.state = state
   }
 }
 
