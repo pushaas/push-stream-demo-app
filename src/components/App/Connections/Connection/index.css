@@ -1,0 +1,12 @@
+.Connection {
+}
+
+.Connection .Connection_actions {
+  display: flex;
+  justify-content: center;
+}
+
+.Connection .Connection_form {
+  display: flex;
+  justify-content: center;
+}
