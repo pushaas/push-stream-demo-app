@@ -22,9 +22,11 @@ class Messages extends Component {
 
     return (
       <div className="Messages">
-        <h3>Messages</h3>
+        <span>Messages</span>
         <pre>
-          {connectionInfo.messages.map(message => (<Fragment key={message.id}>{`${message.text}\n`}</Fragment>))}
+          <code>
+            {connectionInfo.messages.map(message => (<Fragment key={message.id}>{`${message.text}\n`}</Fragment>))}
+          </code>
         </pre>
         {connectionInfo.messages.map(message => (<p>{message}</p>))}
         <form onSubmit={this.handleSubmit}>

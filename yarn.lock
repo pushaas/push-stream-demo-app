@@ -8566,6 +8566,11 @@ sisteransi@^1.0.0:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.0.tgz#77d9622ff909080f1c19e5f4a1df0c1b0a27b88c"
   integrity sha512-N+z4pHB4AmUv0SjveWRd6q1Nj5w62m5jodv+GD8lvmbY/83T/rpbJGZOnK5T149OldDj4Db07BSv9xY4K6NTPQ==
 
+skeleton-css@2.0.4:
+  version "2.0.4"
+  resolved "https://artifactory.globoi.com/artifactory/api/npm/npm-repos/skeleton-css/-/skeleton-css-2.0.4.tgz#d70db2f01fe8209ac79f2f4eee83fae8a40591b8"
+  integrity sha1-1w2y8B/oIJrHny9O7oP66KQFkbg=
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"

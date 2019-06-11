@@ -1,10 +1,10 @@
 .Messages {
 }
 
-.Messages pre {
-  background-color: #ededef;
-  font-size: 12px;
+.Messages code {
+  max-height: 200px;
   min-height: 100px;
+  overflow-y: scroll;
   text-align: left;
   white-space: pre-wrap;
   width: 500px;

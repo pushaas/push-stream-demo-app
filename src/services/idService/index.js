@@ -3,7 +3,7 @@ let globalId = 1
 const generateGlobalId = () => globalId++
 
 const createIdGenerator = () => {
-  let id = 0
+  let id = 1
   return () => id++
 }
 

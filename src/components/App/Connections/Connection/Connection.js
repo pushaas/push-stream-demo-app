@@ -20,7 +20,7 @@ const Connection = ({
 }) => {
   return (
     <div className="Connection">
-      <h2>Connection {connectionInfo.id}</h2>
+      <p>Connection {connectionInfo.id}</p>
 
       <div className="Connection_form">
         <Host connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} />

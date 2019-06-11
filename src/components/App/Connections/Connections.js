@@ -15,6 +15,8 @@ const Header = ({
   return (
     <div className="Connections">
       <AddConnectionInfo onAddConnectionInfo={onAddConnectionInfo} />
+      <hr/>
+
       {connectionsInfo.map(c => (<Connection
         key={c.id}
         connectionInfo={c}
