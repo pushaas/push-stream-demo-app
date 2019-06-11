@@ -1,3 +1,11 @@
 .Messages {
+}
 
+.Messages pre {
+  background-color: #ededef;
+  font-size: 12px;
+  min-height: 100px;
+  text-align: left;
+  white-space: pre-wrap;
+  width: 500px;
 }

@@ -1,7 +1,13 @@
-let id = 1
+let globalId = 1
 
-const generateId = () => id++
+const generateGlobalId = () => globalId++
+
+const createIdGenerator = () => {
+  let id = 0
+  return () => id++
+}
 
 export default {
-  generateId,
+  generateGlobalId,
+  createIdGenerator,
 }

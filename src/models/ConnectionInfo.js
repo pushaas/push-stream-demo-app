@@ -2,6 +2,8 @@ import idService from '../services/idService'
 
 import PushStream from '../external/PushStream'
 
+const idGenerator = idService.createIdGenerator()
+
 class ConnectionInfo {
   constructor({
     channel = '',
@@ -10,13 +12,16 @@ class ConnectionInfo {
     port = '',
     state = PushStream.CLOSED,
   }) {
-    this.id = idService.generateId()
+    this.id = idGenerator()
 
     this.channel = channel
     this.host = host
     this.mode = mode
     this.port = port
     this.state = state
+
+    this.logs = []
+    this.messages = []
   }
 }
 

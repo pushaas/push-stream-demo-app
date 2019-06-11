@@ -15,6 +15,7 @@ const Connection = ({
   onConnect,
   onDisconnect,
   onRemoveConnectionInfo,
+  onSendMessage,
   onUpdateConnectionInfo,
 }) => {
   return (
@@ -35,9 +36,11 @@ const Connection = ({
       </div>
 
       <div className="Connection_data">
-        <Messages />
-        <Logs />
+        <Messages connectionInfo={connectionInfo} onSendMessage={onSendMessage} />
+        <Logs connectionInfo={connectionInfo} />
       </div>
+
+      <hr/>
     </div>
   )
 }

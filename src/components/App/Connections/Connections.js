@@ -9,6 +9,7 @@ const Header = ({
   onConnect,
   onDisconnect,
   onRemoveConnectionInfo,
+  onSendMessage,
   onUpdateConnectionInfo,
 }) => {
   return (
@@ -20,6 +21,7 @@ const Header = ({
         onConnect={() => onConnect(c)}
         onDisconnect={() => onDisconnect(c)}
         onRemoveConnectionInfo={() => onRemoveConnectionInfo(c)}
+        onSendMessage={(message) => onSendMessage(c, message)}
         onUpdateConnectionInfo={(field, value) => onUpdateConnectionInfo(c, field, value)}
       />))}
     </div>
