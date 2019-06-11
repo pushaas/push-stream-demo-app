@@ -11,6 +11,7 @@ const Mode = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
     <div className="Mode">
       <select
+        className="u-full-width"
         value={connectionInfo.mode}
         onChange={(e) => onUpdateConnectionInfo('mode', e.target.value)}
       >

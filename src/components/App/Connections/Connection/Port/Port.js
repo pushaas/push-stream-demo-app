@@ -4,8 +4,9 @@ const Port = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
     <div className="Port">
       <input
+        className="u-full-width"
         type="text"
-        placeholder="Port"
+        placeholder="port"
         onChange={(e) => onUpdateConnectionInfo('port', e.target.value)}
         value={connectionInfo.port}
       />

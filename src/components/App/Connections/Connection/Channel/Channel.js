@@ -4,8 +4,9 @@ const Channel = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
     <div className="Channel">
       <input
+        className="u-full-width"
         type="text"
-        placeholder="Channel"
+        placeholder="channel"
         onChange={(e) => onUpdateConnectionInfo('channel', e.target.value)}
         value={connectionInfo.channel}
       />

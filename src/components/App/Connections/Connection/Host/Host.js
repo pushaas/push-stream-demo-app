@@ -4,8 +4,9 @@ const Host = ({ connectionInfo, onUpdateConnectionInfo }) => {
   return (
     <div className="Host">
       <input
+        className="u-full-width"
         type="text"
-        placeholder="PushStream host"
+        placeholder="pushstream host"
         onChange={(e) => onUpdateConnectionInfo('host', e.target.value)}
         value={connectionInfo.host}
       />

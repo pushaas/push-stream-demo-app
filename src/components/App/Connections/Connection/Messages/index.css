@@ -2,10 +2,10 @@
 }
 
 .Messages code {
+  font-size: 12px;
   max-height: 200px;
   min-height: 100px;
   overflow-y: scroll;
   text-align: left;
   white-space: pre-wrap;
-  width: 500px;
 }
