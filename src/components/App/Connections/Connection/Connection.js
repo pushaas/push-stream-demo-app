@@ -11,6 +11,12 @@ import NewMessage from './NewMessage'
 import Port from './Port'
 import RemoveConnectionInfo from './RemoveConnectionInfo'
 
+import {
+  isClosed,
+  isConnecting,
+  isOpen,
+} from '../../../../services/pushStreamService'
+
 const Connection = ({
   connectionInfo,
   onConnect,
@@ -23,30 +29,27 @@ const Connection = ({
     <div className="Connection">
       <p><label>Connection {connectionInfo.id}</label></p>
 
-      <div className="Connection_form row">
-        <div className="three column"><Host connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three column"><Port connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three column"><Channel connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three column"><Mode connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
+      <div className="row">
+        <div className="three columns"><Host connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
+        <div className="three columns"><Port connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
+        <div className="three columns"><Channel connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
+        <div className="three columns"><Mode connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
       </div>
 
-      <div className="Connection_actions row">
-        <div className="three column"></div>
-        <div className="two column "><Connect onConnect={onConnect} /></div>
-        <div className="two column"><Disconnect onDisconnect={onDisconnect} /></div>
-        <div className="two column"><RemoveConnectionInfo onRemoveConnectionInfo={onRemoveConnectionInfo} /></div>
-        <div className="three column"></div>
+      <div className="row">
+        <div className="offset-by-three two columns"><Connect onConnect={onConnect} /></div>
+        <div className="two columns"><Disconnect onDisconnect={onDisconnect} /></div>
+        <div className="two columns"><RemoveConnectionInfo onRemoveConnectionInfo={onRemoveConnectionInfo} /></div>
       </div>
 
-      <div className="Connection_data row">
-        <div className="six column"><Messages connectionInfo={connectionInfo} /></div>
-        <div className="six column"><Logs connectionInfo={connectionInfo} /></div>
-      </div>
+      {isOpen(connectionInfo) ? (
+        <div className="row">
+          <div className="six columns"><Logs connectionInfo={connectionInfo} /></div>
+          <div className="six columns"><Messages connectionInfo={connectionInfo} /></div>
+        </div>
+      ) : null}
 
-      <div className="Connection_data row">
-        <div className="six column"><NewMessage onSendMessage={onSendMessage} /></div>
-        <div className="six column"></div>
-      </div>
+      {isOpen(connectionInfo) ? (<NewMessage onSendMessage={onSendMessage} />) : null}
 
       <hr/>
     </div>

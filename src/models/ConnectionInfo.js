@@ -10,7 +10,7 @@ class ConnectionInfo {
     host = '',
     mode = '',
     port = '',
-    state = PushStream.CLOSED,
+    status = PushStream.CLOSED,
   }) {
     this.id = idGenerator()
 
@@ -18,7 +18,7 @@ class ConnectionInfo {
     this.host = host
     this.mode = mode
     this.port = port
-    this.state = state
+    this.status = status
 
     this.logs = []
     this.messages = []

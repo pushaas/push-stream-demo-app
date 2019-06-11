@@ -2,9 +2,12 @@ import React from 'react'
 
 const Disconnect = ({ onDisconnect }) => {
   return (
-    <div className="Disconnect">
-      <button onClick={onDisconnect}>disconnect</button>
-    </div>
+    <button
+      className="Disconnect u-full-width"
+      onClick={onDisconnect}
+    >
+      disconnect
+    </button>
   )
 }
 

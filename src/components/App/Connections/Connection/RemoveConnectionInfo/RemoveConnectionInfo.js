@@ -2,9 +2,12 @@ import React from 'react'
 
 const RemoveConnectionInfo = ({ onRemoveConnectionInfo }) => {
   return (
-    <div className="RemoveConnectionInfo">
-      <button onClick={onRemoveConnectionInfo}>remove</button>
-    </div>
+    <button
+      className="RemoveConnectionInfo u-full-width"
+      onClick={onRemoveConnectionInfo}
+    >
+      remove
+    </button>
   )
 }
 

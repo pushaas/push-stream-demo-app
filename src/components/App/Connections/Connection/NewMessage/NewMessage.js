@@ -12,18 +12,39 @@ class NewMessage extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
 
+    const { text } = this.state
+    if (!text) {
+      return
+    }
+
     const { onSendMessage } = this.props
-    onSendMessage(this.state.message)
+    onSendMessage(text)
     this.setState({ text: '' })
   }
 
   render() {
     return (
       <div className="NewMessage">
-        <form onSubmit={this.handleSubmit}>
-          <input type="text" value={this.state.text} onChange={this.handleChangeText} />
-          <button type="submit">send</button>
-        </form>
+        <div className="row">
+          <form onSubmit={this.handleSubmit}>
+            <div className="offset-by-six four columns">
+              <input
+                className="u-full-width"
+                type="text"
+                value={this.state.text}
+                onChange={this.handleChangeText}
+              />
+            </div>
+            <div className="two columns">
+              <button
+                className="u-full-width"
+                type="submit"
+              >
+                send
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     )
   }

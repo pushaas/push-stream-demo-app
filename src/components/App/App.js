@@ -3,13 +3,17 @@ import React, { Component } from 'react'
 import Header from './Header'
 import Connections from './Connections'
 
-import pushStreamService from '../../services/pushStreamService'
+import { newConnection } from '../../services/pushStreamService'
 
 import ConnectionInfo from '../../models/ConnectionInfo'
 import Log from '../../models/Log'
 import Message from '../../models/Message'
 
 import { modeEventSource } from '../../constants/modes'
+
+const pushStreamInstances = {}
+const getPushStreamInstance = (id) => pushStreamInstances[id]
+const deletePushStreamInstance = (id) => delete pushStreamInstances[id]
 
 class App extends Component {
   state = {
@@ -39,7 +43,12 @@ class App extends Component {
     ---------------
   */
   handleSendMessage = (connectionInfo, message) => {
-    connectionInfo.pushStream.sendMessage(message)
+    const { id } = connectionInfo
+    const pushStreamInstance = getPushStreamInstance(id)
+    if (!pushStreamInstance) {
+      return
+    }
+    pushStreamInstance.sendMessage(message)
   }
 
   updateConnectionInfoSuggestions = (field, value) => {
@@ -61,26 +70,28 @@ class App extends Component {
     })
   }
 
-  handleUpdateConnectionInfo = (connectionInfo, field, value) => {
+  handleUpdateConnectionInfo = (connectionInfo, field, value, cb) => {
     this.updateConnectionInfoSuggestions(field, value)
 
     const updated = { ...connectionInfo, [field]: value }
     this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c )],
-    })
+      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
+    }, cb)
   }
 
-  handleAddConnectionLog = (connectionInfo, log) => {
+  handleAddConnectionLog = (id, log) => {
+    const connectionInfo = this.state.connectionsInfo.find(c => c.id === id)
     const updated = { ...connectionInfo, logs: [...connectionInfo.logs, log] }
     this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c )],
+      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
     })
   }
 
-  handleAddConnectionMessage = (connectionInfo, message) => {
+  handleAddConnectionMessage = (id, message) => {
+    const connectionInfo = this.state.connectionsInfo.find(c => c.id === id)
     const updated = { ...connectionInfo, messages: [...connectionInfo.messages, message] }
     this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c )],
+      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
     })
   }
 
@@ -93,8 +104,11 @@ class App extends Component {
   }
 
   handleConnect = (connectionInfo) => {
-    if (connectionInfo.pushStream) {
-      this.handleAddConnectionLog(connectionInfo, new Log({ text: `[handleConnect] already connected` }))
+    const { id } = connectionInfo
+
+
+    if (pushStreamInstances[id]) {
+      this.handleAddConnectionLog(id, new Log({ text: `[handleConnect] already connected` }))
       return
     }
 
@@ -103,22 +117,33 @@ class App extends Component {
       port: connectionInfo.port,
       modes: connectionInfo.mode,
       onchanneldeleted: (a, b, c) => console.log('### onchanneldeleted', a, b, c),
-      onmessage: (message, b, c) => console.log('### onmessage', message, b, c) || this.handleAddConnectionMessage(connectionInfo, new Message({ text: message })),
+      onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
       onerror: (a, b, c) => console.log('### onerror', a, b, c),
-      onstatuschange: (status) => this.handleAddConnectionLog(connectionInfo, new Log({ text: `[onstatuschange] ${status}` })),
+      onstatuschange: (status) => {
+        const connectionInfoNow = this.state.connectionsInfo.find(c => c.id === id)
+        this.handleUpdateConnectionInfo(connectionInfoNow, 'status', status, () => {
+          this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${status}` }))
+        })
+      },
     }
-    connectionInfo.pushStream = pushStreamService.newConnection(settings)
-    connectionInfo.pushStream.addChannel(connectionInfo.channel)
-    connectionInfo.pushStream.connect()
+
+    const pushStreamInstance = newConnection(settings)
+    pushStreamInstance.addChannel(connectionInfo.channel)
+    pushStreamInstance.connect()
+    pushStreamInstances[id] = pushStreamInstance
   }
 
   handleDisconnect = (connectionInfo) => {
-    if (!connectionInfo.pushStream) {
-      this.handleAddConnectionLog(connectionInfo, new Log({ text: `[handleDisconnect] already disconnected` }))
+    const { id } = connectionInfo
+    const pushStreamInstance = getPushStreamInstance(id)
+
+    if (!pushStreamInstance) {
+      this.handleAddConnectionLog(id, new Log({ text: `[handleDisconnect] already disconnected` }))
       return
     }
-    connectionInfo.pushStream.disconnect()
-    delete connectionInfo.pushStream
+
+    pushStreamInstance.disconnect()
+    deletePushStreamInstance(id)
   }
 
   render() {

@@ -1,9 +1,9 @@
 import PushStream from '../../external/PushStream'
 
-const newConnection = (settings) => {
-  return new PushStream(settings)
-}
+export const isClosed = (connectionInfo) => connectionInfo.status === PushStream.CLOSED
+export const isConnecting = (connectionInfo) => connectionInfo.status === PushStream.CONNECTING
+export const isOpen = (connectionInfo) => connectionInfo.status === PushStream.OPEN
 
-export default {
-  newConnection,
+export const newConnection = (settings) => {
+  return new PushStream(settings)
 }

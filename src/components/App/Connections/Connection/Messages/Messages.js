@@ -8,7 +8,6 @@ const Messages = ({ connectionInfo }) => (
         {connectionInfo.messages.map(message => (<Fragment key={message.id}>{`${message.text}\n`}</Fragment>))}
       </code>
     </pre>
-    {connectionInfo.messages.map(message => (<p>{message}</p>))}
   </div>
 )
 
