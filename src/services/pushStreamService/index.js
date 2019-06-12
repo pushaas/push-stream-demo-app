@@ -9,3 +9,10 @@ export const deletePushStreamInstance = (id) => delete pushStreamInstances[id]
 export const getPushStreamInstance = (id) => pushStreamInstances[id]
 export const newPushStreamInstance = (settings) => new PushStream(settings)
 export const setPushStreamInstance = (id, pushStreamInstance) => { pushStreamInstances[id] = pushStreamInstance }
+
+const statuses = {
+  [PushStream.CLOSED]: 'CLOSED',
+  [PushStream.CONNECTING]: 'CONNECTING',
+  [PushStream.OPEN]: 'OPEN',
+}
+export const translateStatus = (status) => (statuses[status])

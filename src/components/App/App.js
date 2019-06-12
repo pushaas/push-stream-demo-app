@@ -8,6 +8,7 @@ import {
   getPushStreamInstance,
   newPushStreamInstance,
   setPushStreamInstance,
+  translateStatus,
 } from '../../services/pushStreamService'
 
 import {
@@ -25,21 +26,18 @@ class App extends Component {
     suggestions: loadSuggestions(),
   }
 
-  findConnectionInfo(id) {
-    return this.state.connectionsInfo.find(c => c.id === id)
+  findConnectionInfo(id, state) {
+    const stateToUse = state ? state : this.state
+    return stateToUse.connectionsInfo.find(c => c.id === id)
   }
 
   updateConnectionInfoSuggestions = (field, value) => {
-    const suggestions = {
-      ...this.state.suggestions,
-      connectionInfo: { ...this.state.suggestions.connectionInfo, [field]: value }
-    }
-
-    saveSuggestions(suggestions)
-
-    this.setState({
-      suggestions,
-    })
+    this.setState((state) => ({
+      suggestions: {
+        ...state.suggestions,
+        connectionInfo: { ...state.suggestions.connectionInfo, [field]: value }
+      },
+    }), () => saveSuggestions(this.state.suggestions))
   }
 
   /*
@@ -65,53 +63,57 @@ class App extends Component {
   }
 
   handleAddConnectionInfo = () => {
-    const connectionInfo = new ConnectionInfo({
-      ...this.state.suggestions.connectionInfo,
-    })
-
-    this.setState({
-      connectionsInfo: [...this.state.connectionsInfo, connectionInfo],
-    })
+    this.setState((state) => ({
+      connectionsInfo: [...state.connectionsInfo, new ConnectionInfo({
+        ...state.suggestions.connectionInfo,
+      })],
+    }))
   }
 
-  handleUpdateConnectionInfo = (id, field, value, cb) => {
+  handleUpdateConnectionInfo = (id, field, value) => {
     this.updateConnectionInfoSuggestions(field, value)
 
-    const connectionInfo = this.findConnectionInfo(id)
-    const updated = { ...connectionInfo, [field]: value }
-    this.setState({
-      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
-    }, cb)
+    this.setState((state) => {
+      const connectionInfo = this.findConnectionInfo(id, state)
+      const updated = { ...connectionInfo, [field]: value }
+      return {
+        connectionsInfo: state.connectionsInfo.map(c => c.id === id ? updated : c ),
+      }
+    })
   }
 
   handleAddConnectionLog = (id, log) => {
-    const connectionInfo = this.findConnectionInfo(id)
 
-    if (!connectionInfo) {
+    if (!this.findConnectionInfo(id)) {
       // se removida, não adiciona os últimos logs
       return
     }
 
-    const updated = { ...connectionInfo, logs: [...connectionInfo.logs, log] }
-    this.setState({
-      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
+    this.setState((state) => {
+      const connectionInfo = this.findConnectionInfo(id, state)
+      const updated = { ...connectionInfo, logs: [...connectionInfo.logs, log] }
+      return {
+        connectionsInfo: state.connectionsInfo.map(c => c.id === id ? updated : c ),
+      }
     })
   }
 
   handleAddConnectionMessage = (id, message) => {
-    const connectionInfo = this.findConnectionInfo(id)
-    const updated = { ...connectionInfo, messages: [...connectionInfo.messages, message] }
-    this.setState({
-      connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
+    this.setState((state) => {
+      const connectionInfo = this.findConnectionInfo(id, state)
+      const updated = { ...connectionInfo, messages: [...connectionInfo.messages, message] }
+      return {
+        connectionsInfo: state.connectionsInfo.map(c => c.id === id ? updated : c ),
+      }
     })
   }
 
   handleRemoveConnectionInfo = (id) => {
     this.handleDisconnect(id)
 
-    this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.filter(c => c.id !== id)],
-    })
+    this.setState((state) => ({
+      connectionsInfo: [...state.connectionsInfo.filter(c => c.id !== id)],
+    }))
   }
 
   handleConnect = (id) => {
@@ -129,10 +131,8 @@ class App extends Component {
       onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
       onerror: (a, b, c) => console.log('### onerror', a, b, c),
       onstatuschange: (status) => {
-        this.handleUpdateConnectionInfo(id, 'status', status, () => {
-          // TODO usar setState com function
-          this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${status}` }))
-        })
+        this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${translateStatus(status)}` }))
+        this.handleUpdateConnectionInfo(id, 'status', status)
       },
     }
 
