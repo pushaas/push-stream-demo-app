@@ -1,8 +1,8 @@
-import idService from '../services/idService'
+import { createIdGenerator } from '../services/idService'
 
 import PushStream from '../external/PushStream'
 
-const idGenerator = idService.createIdGenerator()
+const idGenerator = createIdGenerator()
 
 class ConnectionInfo {
   constructor({

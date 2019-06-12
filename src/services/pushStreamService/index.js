@@ -4,6 +4,8 @@ export const isClosed = (connectionInfo) => connectionInfo.status === PushStream
 export const isConnecting = (connectionInfo) => connectionInfo.status === PushStream.CONNECTING
 export const isOpen = (connectionInfo) => connectionInfo.status === PushStream.OPEN
 
-export const newConnection = (settings) => {
-  return new PushStream(settings)
-}
+const pushStreamInstances = {}
+export const deletePushStreamInstance = (id) => delete pushStreamInstances[id]
+export const getPushStreamInstance = (id) => pushStreamInstances[id]
+export const newPushStreamInstance = (settings) => new PushStream(settings)
+export const setPushStreamInstance = (id, pushStreamInstance) => { pushStreamInstances[id] = pushStreamInstance }

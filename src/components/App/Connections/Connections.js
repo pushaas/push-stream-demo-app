@@ -18,15 +18,20 @@ const Header = ({
 
       <hr/>
 
-      {connectionsInfo.map(c => (<Connection
-        key={c.id}
-        connectionInfo={c}
-        onConnect={() => onConnect(c)}
-        onDisconnect={() => onDisconnect(c)}
-        onRemoveConnectionInfo={() => onRemoveConnectionInfo(c)}
-        onSendMessage={(message) => onSendMessage(c, message)}
-        onUpdateConnectionInfo={(field, value) => onUpdateConnectionInfo(c, field, value)}
-      />))}
+      {connectionsInfo.map((c) => {
+        const { id } = c
+        return (
+          <Connection
+            key={id}
+            connectionInfo={c}
+            onConnect={() => onConnect(id)}
+            onDisconnect={() => onDisconnect(id)}
+            onRemoveConnectionInfo={() => onRemoveConnectionInfo(id)}
+            onSendMessage={(message) => onSendMessage(id, message)}
+            onUpdateConnectionInfo={(field, value) => onUpdateConnectionInfo(id, field, value)}
+          />
+        )
+      })}
     </div>
   )
 }

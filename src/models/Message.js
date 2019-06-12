@@ -1,6 +1,6 @@
-import idService from '../services/idService'
+import { createIdGenerator } from '../services/idService'
 
-const idGenerator = idService.createIdGenerator()
+const idGenerator = createIdGenerator()
 
 export default class Message {
   constructor({

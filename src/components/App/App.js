@@ -3,29 +3,43 @@ import React, { Component } from 'react'
 import Header from './Header'
 import Connections from './Connections'
 
-import { newConnection } from '../../services/pushStreamService'
+import {
+  deletePushStreamInstance,
+  getPushStreamInstance,
+  newPushStreamInstance,
+  setPushStreamInstance,
+} from '../../services/pushStreamService'
+
+import {
+  loadSuggestions,
+  saveSuggestions,
+} from '../../services/suggestionService'
 
 import ConnectionInfo from '../../models/ConnectionInfo'
 import Log from '../../models/Log'
 import Message from '../../models/Message'
 
-import { modeEventSource } from '../../constants/modes'
-
-const pushStreamInstances = {}
-const getPushStreamInstance = (id) => pushStreamInstances[id]
-const deletePushStreamInstance = (id) => delete pushStreamInstances[id]
-
 class App extends Component {
   state = {
     connectionsInfo: [],
-    suggestions: {
-      connectionInfo: {
-        channel: 'test',
-        host: 'localhost',
-        mode: modeEventSource,
-        port: '9080',
-      },
-    },
+    suggestions: loadSuggestions(),
+  }
+
+  findConnectionInfo(id) {
+    return this.state.connectionsInfo.find(c => c.id === id)
+  }
+
+  updateConnectionInfoSuggestions = (field, value) => {
+    const suggestions = {
+      ...this.state.suggestions,
+      connectionInfo: { ...this.state.suggestions.connectionInfo, [field]: value }
+    }
+
+    saveSuggestions(suggestions)
+
+    this.setState({
+      suggestions,
+    })
   }
 
   /*
@@ -42,22 +56,12 @@ class App extends Component {
     handlers
     ---------------
   */
-  handleSendMessage = (connectionInfo, message) => {
-    const { id } = connectionInfo
+  handleSendMessage = (id, message) => {
     const pushStreamInstance = getPushStreamInstance(id)
     if (!pushStreamInstance) {
       return
     }
     pushStreamInstance.sendMessage(message)
-  }
-
-  updateConnectionInfoSuggestions = (field, value) => {
-    this.setState({
-      suggestions: {
-        ...this.state.suggestions,
-        connectionInfo: { ...this.state.suggestions.connectionInfo, [field]: value }
-      }
-    })
   }
 
   handleAddConnectionInfo = () => {
@@ -70,9 +74,10 @@ class App extends Component {
     })
   }
 
-  handleUpdateConnectionInfo = (connectionInfo, field, value, cb) => {
+  handleUpdateConnectionInfo = (id, field, value, cb) => {
     this.updateConnectionInfoSuggestions(field, value)
 
+    const connectionInfo = this.findConnectionInfo(id)
     const updated = { ...connectionInfo, [field]: value }
     this.setState({
       connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
@@ -80,7 +85,13 @@ class App extends Component {
   }
 
   handleAddConnectionLog = (id, log) => {
-    const connectionInfo = this.state.connectionsInfo.find(c => c.id === id)
+    const connectionInfo = this.findConnectionInfo(id)
+
+    if (!connectionInfo) {
+      // se removida, não adiciona os últimos logs
+      return
+    }
+
     const updated = { ...connectionInfo, logs: [...connectionInfo.logs, log] }
     this.setState({
       connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
@@ -88,30 +99,28 @@ class App extends Component {
   }
 
   handleAddConnectionMessage = (id, message) => {
-    const connectionInfo = this.state.connectionsInfo.find(c => c.id === id)
+    const connectionInfo = this.findConnectionInfo(id)
     const updated = { ...connectionInfo, messages: [...connectionInfo.messages, message] }
     this.setState({
       connectionsInfo: this.state.connectionsInfo.map(c => c === connectionInfo ? updated : c ),
     })
   }
 
-  handleRemoveConnectionInfo = (connectionInfo) => {
-    this.handleDisconnect(connectionInfo)
+  handleRemoveConnectionInfo = (id) => {
+    this.handleDisconnect(id)
 
     this.setState({
-      connectionsInfo: [...this.state.connectionsInfo.filter(c => c !== connectionInfo)],
+      connectionsInfo: [...this.state.connectionsInfo.filter(c => c.id !== id)],
     })
   }
 
-  handleConnect = (connectionInfo) => {
-    const { id } = connectionInfo
-
-
-    if (pushStreamInstances[id]) {
+  handleConnect = (id) => {
+    if (getPushStreamInstance(id)) {
       this.handleAddConnectionLog(id, new Log({ text: `[handleConnect] already connected` }))
       return
     }
 
+    const connectionInfo = this.findConnectionInfo(id)
     const settings = {
       host: connectionInfo.hostname,
       port: connectionInfo.port,
@@ -120,21 +129,20 @@ class App extends Component {
       onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
       onerror: (a, b, c) => console.log('### onerror', a, b, c),
       onstatuschange: (status) => {
-        const connectionInfoNow = this.state.connectionsInfo.find(c => c.id === id)
-        this.handleUpdateConnectionInfo(connectionInfoNow, 'status', status, () => {
+        this.handleUpdateConnectionInfo(id, 'status', status, () => {
+          // TODO usar setState com function
           this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${status}` }))
         })
       },
     }
 
-    const pushStreamInstance = newConnection(settings)
+    const pushStreamInstance = newPushStreamInstance(settings)
     pushStreamInstance.addChannel(connectionInfo.channel)
     pushStreamInstance.connect()
-    pushStreamInstances[id] = pushStreamInstance
+    setPushStreamInstance(id, pushStreamInstance)
   }
 
-  handleDisconnect = (connectionInfo) => {
-    const { id } = connectionInfo
+  handleDisconnect = (id) => {
     const pushStreamInstance = getPushStreamInstance(id)
 
     if (!pushStreamInstance) {
@@ -146,6 +154,11 @@ class App extends Component {
     deletePushStreamInstance(id)
   }
 
+  /*
+    ---------------
+    render
+    ---------------
+  */
   render() {
     return (
       <div className="App">
