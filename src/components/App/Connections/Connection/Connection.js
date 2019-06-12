@@ -1,8 +1,7 @@
 import React from 'react'
 
 import Channel from './Channel'
-import Connect from './Connect'
-import Disconnect from './Disconnect'
+import ToggleConnect from './ToggleConnect'
 import Host from './Host'
 import Logs from './Logs'
 import Messages from './Messages'
@@ -13,8 +12,6 @@ import RemoveConnectionInfo from './RemoveConnectionInfo'
 
 import {
   isClosed,
-  isConnecting,
-  isOpen,
 } from '../../../../services/pushStreamService'
 
 const Connection = ({
@@ -25,31 +22,43 @@ const Connection = ({
   onSendMessage,
   onUpdateConnectionInfo,
 }) => {
+  // fields
+  const fieldsDisabled = !isClosed(connectionInfo)
+  const host = <Host disabled={fieldsDisabled} connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} />
+  const port = <Port disabled={fieldsDisabled} connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} />
+  const channel = <Channel disabled={fieldsDisabled} connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} />
+  const mode = <Mode disabled={fieldsDisabled} connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} />
+
+  // buttons
+  const toggleConnect = <ToggleConnect connectionInfo={connectionInfo} onConnect={onConnect} onDisconnect={onDisconnect} />
+  const removeConnectionInfo = <RemoveConnectionInfo onRemoveConnectionInfo={onRemoveConnectionInfo} />
+
+  // data
+  const logs = <Logs connectionInfo={connectionInfo} />
+  const messages = <Messages connectionInfo={connectionInfo} />
+
   return (
     <div className="Connection">
       <p><label>Connection {connectionInfo.id}</label></p>
 
       <div className="row">
-        <div className="three columns"><Host connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three columns"><Port connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three columns"><Channel connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
-        <div className="three columns"><Mode connectionInfo={connectionInfo} onUpdateConnectionInfo={onUpdateConnectionInfo} /></div>
+        <div className="three columns">{host}</div>
+        <div className="three columns">{port}</div>
+        <div className="three columns">{channel}</div>
+        <div className="three columns">{mode}</div>
       </div>
 
       <div className="row">
-        <div className="offset-by-three two columns"><Connect onConnect={onConnect} /></div>
-        <div className="two columns"><Disconnect onDisconnect={onDisconnect} /></div>
-        <div className="two columns"><RemoveConnectionInfo onRemoveConnectionInfo={onRemoveConnectionInfo} /></div>
+        <div className="offset-by-three three columns">{toggleConnect}</div>
+        <div className="three columns">{removeConnectionInfo}</div>
       </div>
 
-      {isOpen(connectionInfo) ? (
-        <div className="row">
-          <div className="six columns"><Logs connectionInfo={connectionInfo} /></div>
-          <div className="six columns"><Messages connectionInfo={connectionInfo} /></div>
-        </div>
-      ) : null}
+      <div className="row">
+        <div className="six columns">{logs}</div>
+        <div className="six columns">{messages}</div>
+      </div>
 
-      {isOpen(connectionInfo) ? (<NewMessage onSendMessage={onSendMessage} />) : null}
+      <NewMessage connectionInfo={connectionInfo} onSendMessage={onSendMessage} />
 
       <hr/>
     </div>

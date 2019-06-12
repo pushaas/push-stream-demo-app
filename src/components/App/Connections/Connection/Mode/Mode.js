@@ -7,11 +7,12 @@ import {
   modeWebSocket,
 } from '../../../../../constants/modes'
 
-const Mode = ({ connectionInfo, onUpdateConnectionInfo }) => {
+const Mode = ({ disabled, connectionInfo, onUpdateConnectionInfo }) => {
   return (
     <div className="Mode">
       <select
         className="u-full-width"
+        disabled={disabled}
         value={connectionInfo.mode}
         onChange={(e) => onUpdateConnectionInfo('mode', e.target.value)}
       >

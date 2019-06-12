@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 
+import {
+  isOpen,
+} from '../../../../../services/pushStreamService'
+
 class NewMessage extends Component {
   state = {
     text: '',
@@ -23,6 +27,9 @@ class NewMessage extends Component {
   }
 
   render() {
+    const { connectionInfo } = this.props
+    const disabled = !isOpen(connectionInfo)
+
     return (
       <div className="NewMessage">
         <div className="row">
@@ -30,6 +37,7 @@ class NewMessage extends Component {
             <div className="offset-by-six four columns">
               <input
                 className="u-full-width"
+                disabled={disabled}
                 type="text"
                 value={this.state.text}
                 onChange={this.handleChangeText}
@@ -38,6 +46,7 @@ class NewMessage extends Component {
             <div className="two columns">
               <button
                 className="u-full-width"
+                disabled={disabled}
                 type="submit"
               >
                 send
