@@ -32,6 +32,11 @@ class App extends Component {
   }
 
   updateConnectionInfoSuggestions = (field, value) => {
+    const fieldsWithSuggestion = ['channel', 'host', 'mode', 'port']
+    if (!fieldsWithSuggestion.includes(field)) {
+      return
+    }
+
     this.setState((state) => ({
       suggestions: {
         ...state.suggestions,
