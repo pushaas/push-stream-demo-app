@@ -16,3 +16,8 @@ const statuses = {
   [PushStream.OPEN]: 'OPEN',
 }
 export const translateStatus = (status) => (statuses[status])
+
+export const LOG_LEVEL_DEBUG = 'debug'
+export const LOG_LEVEL_INFO = 'info'
+export const LOG_LEVEL_ERROR = 'error'
+export const setLogLevel = (level) => { PushStream.LOG_LEVEL = level }

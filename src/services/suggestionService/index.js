@@ -3,6 +3,10 @@ import debounce from 'lodash/debounce'
 import { suggestionsKey } from '../../constants/localStorage'
 import { modeEventSource } from '../../constants/modes'
 
+import {
+  LOG_LEVEL_ERROR,
+} from '../pushStreamService'
+
 const getDefaults = () => ({
   connectionInfo: {
     channel: 'test',
@@ -10,18 +14,28 @@ const getDefaults = () => ({
     mode: modeEventSource,
     port: '9080',
   },
+  logLevel: LOG_LEVEL_ERROR,
 })
 
-export const clearSuggestions = () => localStorage.removeItem(suggestionsKey)
+export const resetSuggestions = () => localStorage.removeItem(suggestionsKey)
 
-export const loadSuggestions = () => {
+export const loadSuggestions = (key) => {
   const savedSuggestion = localStorage.getItem(suggestionsKey)
-  if (savedSuggestion) {
-    return JSON.parse(savedSuggestion)
-  }
-  return getDefaults()
+  const suggestion = savedSuggestion ? JSON.parse(savedSuggestion) : getDefaults()
+  return key ? suggestion[key] : suggestion
 }
 
+const doSave = (suggestions) => localStorage.setItem(suggestionsKey, JSON.stringify(suggestions))
+
 export const saveSuggestions = debounce((suggestions) => {
-  localStorage.setItem(suggestionsKey, JSON.stringify(suggestions))
-}, 300)
+  doSave(suggestions)
+}, 200)
+
+export const updateSuggestions = debounce((key, value) => {
+  const suggestions = loadSuggestions()
+  const updated = {
+    ...suggestions,
+    [key]: value,
+  }
+  doSave(updated)
+}, 200)

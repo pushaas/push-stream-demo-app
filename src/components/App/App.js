@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 
-import Header from './Header'
 import Connections from './Connections'
+import Footer from './Footer'
+import Header from './Header'
 
 import {
   deletePushStreamInstance,
@@ -13,17 +14,19 @@ import {
 
 import {
   loadSuggestions,
-  saveSuggestions,
+  updateSuggestions,
 } from '../../services/suggestionService'
 
 import ConnectionInfo from '../../models/ConnectionInfo'
 import Log from '../../models/Log'
 import Message from '../../models/Message'
 
+const suggestionsKey = 'connectionInfo'
+
 class App extends Component {
   state = {
     connectionsInfo: [],
-    suggestions: loadSuggestions(),
+    suggestions: loadSuggestions(suggestionsKey),
   }
 
   findConnectionInfo(id, state) {
@@ -40,9 +43,9 @@ class App extends Component {
     this.setState((state) => ({
       suggestions: {
         ...state.suggestions,
-        connectionInfo: { ...state.suggestions.connectionInfo, [field]: value }
+        [field]: value,
       },
-    }), () => saveSuggestions(this.state.suggestions))
+    }), () => updateSuggestions(suggestionsKey, this.state.suggestions))
   }
 
   /*
@@ -70,7 +73,7 @@ class App extends Component {
   handleAddConnectionInfo = () => {
     this.setState((state) => ({
       connectionsInfo: [...state.connectionsInfo, new ConnectionInfo({
-        ...state.suggestions.connectionInfo,
+        ...state.suggestions,
       })],
     }))
   }
@@ -129,12 +132,19 @@ class App extends Component {
 
     const connectionInfo = this.findConnectionInfo(id)
     const settings = {
-      host: connectionInfo.hostname,
+      host: connectionInfo.host,
       port: connectionInfo.port,
       modes: connectionInfo.mode,
-      onchanneldeleted: (a, b, c) => console.log('### onchanneldeleted', a, b, c),
+      onchanneldeleted: (info) => {
+        console.warn('[onchanneldeleted]', info)
+        this.handleAddConnectionLog(id, new Log({ text: `[onchanneldeleted] ${JSON.stringify(info)}` }))
+      },
       onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
-      onerror: (a, b, c) => console.log('### onerror', a, b, c),
+      onerror: (err) => {
+        console.error('[onerror]', err)
+        this.handleAddConnectionLog(id, new Log({ text: `[onerror] ${JSON.stringify(err)}` }))
+        deletePushStreamInstance(id)
+      },
       onstatuschange: (status) => {
         this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${translateStatus(status)}` }))
         this.handleUpdateConnectionInfo(id, 'status', status)
@@ -177,6 +187,7 @@ class App extends Component {
           onSendMessage={this.handleSendMessage}
           onUpdateConnectionInfo={this.handleUpdateConnectionInfo}
         />
+        <Footer />
       </div>
     )
   }
