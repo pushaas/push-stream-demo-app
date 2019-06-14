@@ -12,7 +12,7 @@ const getDefaults = () => ({
   },
 })
 
-export const clearSuggestions = localStorage.removeItem(suggestionsKey)
+export const clearSuggestions = () => localStorage.removeItem(suggestionsKey)
 
 export const loadSuggestions = () => {
   const savedSuggestion = localStorage.getItem(suggestionsKey)
