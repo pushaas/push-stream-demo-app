@@ -21,7 +21,10 @@ import ConnectionInfo from '../../models/ConnectionInfo'
 import Log from '../../models/Log'
 import Message from '../../models/Message'
 
+import { modeStream } from '../../constants/modes'
+
 const suggestionsKey = 'connectionInfo'
+let hasUsedStream = false
 
 class App extends Component {
   state = {
@@ -131,21 +134,30 @@ class App extends Component {
     }
 
     const connectionInfo = this.findConnectionInfo(id)
+    // workaround: tream is only working after the first try, so retry automatically on first try
+    const shouldRetry = connectionInfo.mode === modeStream && !hasUsedStream
+
     const settings = {
       host: connectionInfo.host,
       port: connectionInfo.port,
       modes: connectionInfo.mode,
       onchanneldeleted: (info) => {
+        if (shouldRetry) return
+
         console.warn('[onchanneldeleted]', info)
         this.handleAddConnectionLog(id, new Log({ text: `[onchanneldeleted] ${JSON.stringify(info)}` }))
       },
       onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
       onerror: (err) => {
+        if (shouldRetry) return
+
         console.error('[onerror]', err)
         this.handleAddConnectionLog(id, new Log({ text: `[onerror] ${JSON.stringify(err)}` }))
         deletePushStreamInstance(id)
       },
       onstatuschange: (status) => {
+        if (shouldRetry) return
+
         this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${translateStatus(status)}` }))
         this.handleUpdateConnectionInfo(id, 'status', status)
       },
@@ -155,6 +167,12 @@ class App extends Component {
     pushStreamInstance.addChannel(connectionInfo.channel)
     pushStreamInstance.connect()
     setPushStreamInstance(id, pushStreamInstance)
+
+    if (shouldRetry) {
+      hasUsedStream = true
+      this.handleDisconnect(id)
+      this.handleConnect(id)
+    }
   }
 
   handleDisconnect = (id) => {

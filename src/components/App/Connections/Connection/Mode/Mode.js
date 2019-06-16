@@ -18,7 +18,7 @@ const Mode = ({ disabled, connectionInfo, onUpdateConnectionInfo }) => {
       >
         <option value={modeEventSource}>{modeEventSource}</option>
         <option value={modeLongPolling}>{modeLongPolling}</option>
-        <option value={modeStream}>{modeStream} (works on 2nd try)</option>
+        <option value={modeStream}>{modeStream}</option>
         <option value={modeWebSocket}>{modeWebSocket}</option>
       </select>
     </div>
