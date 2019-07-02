@@ -142,21 +142,27 @@ class App extends Component {
       port: connectionInfo.port,
       modes: connectionInfo.mode,
       onchanneldeleted: (info) => {
-        if (shouldRetry) return
+        if (shouldRetry) {
+          return
+        }
 
         console.warn('[onchanneldeleted]', info)
         this.handleAddConnectionLog(id, new Log({ text: `[onchanneldeleted] ${JSON.stringify(info)}` }))
       },
       onmessage: (message, messageId, channel) => this.handleAddConnectionMessage(id, new Message({ text: message })),
       onerror: (err) => {
-        if (shouldRetry) return
+        if (shouldRetry) {
+          return
+        }
 
         console.error('[onerror]', err)
         this.handleAddConnectionLog(id, new Log({ text: `[onerror] ${JSON.stringify(err)}` }))
         deletePushStreamInstance(id)
       },
       onstatuschange: (status) => {
-        if (shouldRetry) return
+        if (shouldRetry) {
+          return
+        }
 
         this.handleAddConnectionLog(id, new Log({ text: `[onstatuschange] ${translateStatus(status)}` }))
         this.handleUpdateConnectionInfo(id, 'status', status)
